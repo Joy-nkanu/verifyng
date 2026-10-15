@@ -1,15 +1,18 @@
 import { motion } from "framer-motion";
-import { ShieldCheck, ShieldX, Calendar, Factory, MapPin, Hash, FileText, Users, ArrowLeft, AlertTriangle } from "lucide-react";
+import { ShieldCheck, ShieldX, Calendar, Factory, MapPin, Hash, FileText, ArrowLeft, AlertTriangle, LoaderCircle, ExternalLink } from "lucide-react";
 import type { ProductInfo } from "@/lib/mockProducts";
+import { getProductResultKind } from "@/lib/productStatus";
+import { Button } from "@/components/ui/button";
 
 interface VerificationResultProps {
   product: ProductInfo | null;
   scannedCode: string;
+  lookupState: "loading" | "sample" | "found" | "not_found" | "error";
   onReset: () => void;
 }
 
-const VerificationResult = ({ product, scannedCode, onReset }: VerificationResultProps) => {
-  const isExpired = product ? new Date(product.expiryDate) < new Date() : false;
+const VerificationResult = ({ product, scannedCode, lookupState, onReset }: VerificationResultProps) => {
+  const kind = getProductResultKind(lookupState);
 
   return (
     <motion.div
@@ -18,112 +21,95 @@ const VerificationResult = ({ product, scannedCode, onReset }: VerificationResul
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="w-full"
     >
-      <button
+      <Button
         onClick={onReset}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 active:scale-[0.97]"
+        variant="ghost"
+        className="mb-6 px-0 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="w-4 h-4" />
         Scan another product
-      </button>
+      </Button>
 
-      {!product ? (
-        <div className="bg-card rounded-2xl p-8 shadow-sm shadow-foreground/5 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
-            <ShieldX className="w-8 h-8 text-destructive" />
-          </div>
-          <h2 className="text-xl font-bold mb-2">Product Not Found</h2>
-          <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-            No product with barcode <span className="font-mono font-semibold text-foreground">{scannedCode}</span> was found in our database. This product may be counterfeit or unregistered.
-          </p>
-          <div className="mt-6 p-4 rounded-lg bg-destructive/5 border border-destructive/10">
-            <p className="text-sm text-destructive font-medium">
-              ⚠️ Do not consume this product. Report to NAFDAC if suspicious.
-            </p>
-          </div>
+      {kind === "loading" ? (
+        <div className="py-16 text-center" role="status" aria-live="polite">
+          <LoaderCircle className="w-8 h-8 mx-auto mb-4 animate-spin text-primary" />
+          <h2 className="text-xl font-bold mb-2">Looking up barcode</h2>
+          <p className="text-sm text-muted-foreground font-mono">{scannedCode}</p>
         </div>
-      ) : (
+      ) : kind === "no_catalog_match" || kind === "lookup_error" ? (
+        <div className="bg-card rounded-xl p-8 shadow-sm shadow-foreground/5 text-center">
+          <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${kind === "lookup_error" ? "bg-warning/10" : "bg-secondary"}`}>
+            {kind === "lookup_error" ? <AlertTriangle className="w-8 h-8 text-warning" /> : <ShieldX className="w-8 h-8 text-muted-foreground" />}
+          </div>
+          <h2 className="text-xl font-bold mb-2">{kind === "lookup_error" ? "Lookup unavailable" : "No product listing found"}</h2>
+          <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+            {kind === "lookup_error"
+              ? "The product catalog could not be reached. Please try again."
+              : <>No listing for barcode <span className="font-mono font-semibold text-foreground">{scannedCode}</span> was found in the product catalog.</>}
+          </p>
+          <p className="mt-5 text-sm text-muted-foreground">
+            A missing listing does not prove a product is counterfeit. This catalog cannot confirm NAFDAC registration, batch authenticity, production date, or expiry date.
+          </p>
+        </div>
+      ) : product ? (
         <div className="space-y-4">
           {/* Status Banner */}
-          <div
-            className={`rounded-2xl p-6 flex items-center gap-4 ${
-              product.isAuthentic && !isExpired
-                ? "bg-primary/10 border border-primary/20"
-                : "bg-destructive/10 border border-destructive/20"
-            }`}
-          >
-            <div
-              className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${
-                product.isAuthentic && !isExpired ? "bg-primary" : "bg-destructive"
-              }`}
-            >
-              {product.isAuthentic && !isExpired ? (
-                <ShieldCheck className="w-7 h-7 text-primary-foreground" />
-              ) : (
-                <ShieldX className="w-7 h-7 text-destructive-foreground" />
-              )}
+          <div className={`rounded-xl p-6 flex items-center gap-4 ${product.source === "sample" ? "bg-secondary border border-border" : "bg-primary/10 border border-primary/20"}`}>
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${product.source === "sample" ? "bg-muted" : "bg-primary"}`}>
+              {product.source === "sample" ? <AlertTriangle className="w-7 h-7 text-muted-foreground" /> : <ShieldCheck className="w-7 h-7 text-primary-foreground" />}
             </div>
-            <div>
-              <h2
-                className={`text-lg font-bold ${
-                  product.isAuthentic && !isExpired ? "text-primary" : "text-destructive"
-                }`}
-              >
-                {product.isAuthentic && !isExpired
-                  ? "Verified Authentic"
-                  : isExpired
-                  ? "Product Expired"
-                  : "Potentially Counterfeit"}
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold">
+                {product.source === "sample" ? "Sample record" : "Product listing found"}
               </h2>
               <p className="text-sm text-muted-foreground mt-0.5">
-                {product.isAuthentic && !isExpired
-                  ? "This product is registered and verified."
-                  : isExpired
-                  ? "This product has passed its expiry date."
-                  : "This product could not be verified. Exercise caution."}
+                {product.source === "sample"
+                  ? "Example data only — this is not a live product check."
+                  : "A catalog entry matches this barcode. Authenticity is not verified."}
               </p>
             </div>
           </div>
 
           {/* Product Details */}
-          <div className="bg-card rounded-2xl p-6 shadow-sm shadow-foreground/5">
+          <div className="bg-card rounded-xl p-6 shadow-sm shadow-foreground/5">
             <h3 className="font-display font-bold text-lg mb-1">{product.name}</h3>
             <p className="text-sm text-muted-foreground mb-5">{product.brand} · {product.category}</p>
 
             <div className="space-y-4">
               <DetailRow icon={Hash} label="Barcode" value={product.barcode} mono />
-              <DetailRow icon={FileText} label="NAFDAC Reg. No." value={product.nafdacNumber} mono />
-              <DetailRow icon={Hash} label="Batch Number" value={product.batchNumber} mono />
-              <DetailRow icon={Calendar} label="Production Date" value={formatDate(product.productionDate)} />
-              <DetailRow
-                icon={Calendar}
-                label="Expiry Date"
-                value={formatDate(product.expiryDate)}
-                alert={isExpired}
-              />
-              <DetailRow icon={Factory} label="Manufacturer" value={product.manufacturer} />
-              <DetailRow icon={MapPin} label="Country of Origin" value={product.countryOfOrigin} />
-              <DetailRow icon={Users} label="Times Verified" value={product.verificationCount.toLocaleString()} />
+              <DetailRow icon={FileText} label="NAFDAC Reg. No." value={product.nafdacNumber || "Not available from this source"} mono />
+              <DetailRow icon={Hash} label="Batch Number" value={product.batchNumber || "Not available from this source"} mono />
+              <DetailRow icon={Calendar} label="Production Date" value={product.productionDate ? formatDate(product.productionDate) : "Not available from this source"} />
+              <DetailRow icon={Calendar} label="Expiry Date" value={product.expiryDate ? formatDate(product.expiryDate) : "Not available from this source"} />
+              <DetailRow icon={Factory} label="Manufacturer / Production place" value={product.manufacturer || "Not available from this source"} />
+              <DetailRow icon={MapPin} label="Country" value={product.countryOfOrigin || "Not available from this source"} />
             </div>
           </div>
 
           {/* Ingredients */}
-          <div className="bg-card rounded-2xl p-6 shadow-sm shadow-foreground/5">
+          <div className="bg-card rounded-xl p-6 shadow-sm shadow-foreground/5">
             <h4 className="font-display font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-3">
               Ingredients / Composition
             </h4>
-            <p className="text-sm leading-relaxed">{product.ingredients}</p>
+            <p className="text-sm leading-relaxed">{product.ingredients || "Not available from this source."}</p>
           </div>
 
-          {isExpired && (
-            <div className="p-4 rounded-lg bg-warning/10 border border-warning/20 flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
-              <p className="text-sm">
-                This product expired on <strong>{formatDate(product.expiryDate)}</strong>. Do not consume expired products.
-              </p>
-            </div>
+          <div className="p-4 rounded-lg bg-warning/10 border border-warning/20 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+            <p className="text-sm">
+              {product.source === "sample"
+                ? "Sample values are illustrative and may not describe any real package or batch."
+                : "This public catalog does not verify NAFDAC registration, batch authenticity, production date, or expiry date."}
+            </p>
+          </div>
+
+          {product.source === "catalog" && product.sourceUrl && (
+            <a href={product.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+              View catalog record <ExternalLink className="w-4 h-4" />
+            </a>
           )}
         </div>
-      )}
+      ) : null}
     </motion.div>
   );
 };
@@ -155,7 +141,9 @@ function DetailRow({
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-NG", {
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString("en-NG", {
     year: "numeric",
     month: "long",
     day: "numeric",

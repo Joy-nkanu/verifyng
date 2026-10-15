@@ -1,0 +1,1 @@
+- Keep live barcode lookups in a Lovable Cloud Edge Function, not the browser, so the external catalog is called from one validated, server-side boundary.
