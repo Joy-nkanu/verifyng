@@ -6,15 +6,30 @@ import ManualEntry from "@/components/ManualEntry";
 import VerificationResult from "@/components/VerificationResult";
 import HowItWorks from "@/components/HowItWorks";
 import { verifyProduct, type ProductInfo } from "@/lib/mockProducts";
+import { lookupProduct } from "@/lib/productLookup";
+
+type LookupState = "loading" | "sample" | "found" | "not_found" | "error";
 
 const Index = () => {
   const [scannerActive, setScannerActive] = useState(false);
-  const [result, setResult] = useState<{ product: ProductInfo | null; code: string } | null>(null);
+  const [result, setResult] = useState<{ product: ProductInfo | null; code: string; state: LookupState } | null>(null);
 
   const handleVerify = useCallback((code: string) => {
-    const product = verifyProduct(code);
-    setResult({ product, code });
+    const normalizedCode = code.trim();
+    const sampleProduct = verifyProduct(normalizedCode);
+    if (sampleProduct) {
+      setResult({ product: sampleProduct, code: normalizedCode, state: "sample" });
+      setScannerActive(false);
+      return;
+    }
+
+    setResult({ product: null, code: normalizedCode, state: "loading" });
     setScannerActive(false);
+
+    void lookupProduct(normalizedCode).then(
+      (product) => setResult({ product, code: normalizedCode, state: product ? "found" : "not_found" }),
+      () => setResult({ product: null, code: normalizedCode, state: "error" }),
+    );
   }, []);
 
   const handleReset = useCallback(() => {
@@ -48,7 +63,7 @@ const Index = () => {
                 <span className="text-primary">genuine?</span>
               </h1>
               <p className="text-muted-foreground text-base max-w-sm mx-auto leading-relaxed">
-                Scan any product barcode to instantly verify its authenticity, expiry date, and registration status.
+                Scan a barcode to look up its product listing and available details.
               </p>
             </motion.section>
 
@@ -79,7 +94,7 @@ const Index = () => {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="mt-8 p-4 rounded-xl bg-secondary/60 border border-border/50"
             >
-              <p className="text-xs text-muted-foreground mb-2 font-medium">Try these demo barcodes:</p>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">Sample records · not live verification</p>
               <div className="flex flex-wrap gap-2">
                 {["5901234123457", "8901234567890", "6161100000001", "1234567890123"].map((code) => (
                   <button
@@ -100,6 +115,7 @@ const Index = () => {
             <VerificationResult
               product={result.product}
               scannedCode={result.code}
+              lookupState={result.state}
               onReset={handleReset}
             />
           </div>

@@ -3,15 +3,15 @@ export interface ProductInfo {
   brand: string;
   category: string;
   barcode: string;
-  nafdacNumber: string;
-  batchNumber: string;
-  productionDate: string;
-  expiryDate: string;
-  manufacturer: string;
-  countryOfOrigin: string;
-  ingredients: string;
-  isAuthentic: boolean;
-  verificationCount: number;
+  nafdacNumber?: string;
+  batchNumber?: string;
+  productionDate?: string;
+  expiryDate?: string;
+  manufacturer?: string;
+  countryOfOrigin?: string;
+  ingredients?: string;
+  source: "sample" | "catalog";
+  sourceUrl?: string;
   imageUrl?: string;
 }
 
@@ -28,8 +28,7 @@ export const mockProducts: Record<string, ProductInfo> = {
     manufacturer: "Emzor Pharmaceutical Industries Ltd",
     countryOfOrigin: "Nigeria",
     ingredients: "Paracetamol BP 500mg, Maize Starch, Povidone K30, Stearic Acid",
-    isAuthentic: true,
-    verificationCount: 1247,
+    source: "sample",
   },
   "8901234567890": {
     name: "Golden Penny Semovita 2kg",
@@ -43,8 +42,7 @@ export const mockProducts: Record<string, ProductInfo> = {
     manufacturer: "Flour Mills of Nigeria Plc",
     countryOfOrigin: "Nigeria",
     ingredients: "100% Cassava Flour, Vitamins (A, B1, B2, Niacin, Folic Acid, Iron, Zinc)",
-    isAuthentic: true,
-    verificationCount: 3892,
+    source: "sample",
   },
   "1234567890123": {
     name: "Suspicious Paracetamol 500mg",
@@ -58,8 +56,7 @@ export const mockProducts: Record<string, ProductInfo> = {
     manufacturer: "Unverified Source",
     countryOfOrigin: "Unknown",
     ingredients: "Not verified",
-    isAuthentic: false,
-    verificationCount: 0,
+    source: "sample",
   },
   "6161100000001": {
     name: "Peak Evaporated Milk 170g",
@@ -73,8 +70,7 @@ export const mockProducts: Record<string, ProductInfo> = {
     manufacturer: "FrieslandCampina WAMCO Nigeria Plc",
     countryOfOrigin: "Nigeria",
     ingredients: "Fresh Cow Milk, Vegetable Fat, Stabilizer (E339), Vitamins A, D3",
-    isAuthentic: true,
-    verificationCount: 5614,
+    source: "sample",
   },
 };
 
