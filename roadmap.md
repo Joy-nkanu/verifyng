@@ -1,0 +1,3 @@
+- [ ] Add live product-catalog lookup through Lovable Cloud.
+- [ ] Update results to distinguish sample records, catalog matches, and lookup failures without claiming authenticity.
+- [ ] Add and run focused validation/status tests; verify a real barcode end to end.
