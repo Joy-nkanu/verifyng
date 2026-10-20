@@ -9,6 +9,8 @@ interface CatalogProduct {
   ingredients_text?: string;
   manufacturing_places?: string;
   countries?: string;
+  manufacturing_date?: string;
+  expiration_date?: string;
 }
 
 interface LookupResponse {
@@ -34,6 +36,8 @@ export async function lookupProduct(barcode: string): Promise<ProductInfo | null
     brand: item.brands?.trim() || "Brand not listed",
     category: item.categories?.split(",")[0]?.trim() || "Category not listed",
     barcode: item.code || barcode,
+    productionDate: item.manufacturing_date?.trim() || undefined,
+    expiryDate: item.expiration_date?.trim() || undefined,
     manufacturer: item.manufacturing_places?.trim() || undefined,
     countryOfOrigin: item.countries?.trim() || undefined,
     ingredients: item.ingredients_text?.trim() || undefined,
