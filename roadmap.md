@@ -1,3 +1,4 @@
 - [x] Add live product-catalog lookup through Lovable Cloud.
 - [x] Update results to distinguish sample records, catalog matches, and lookup failures without claiming authenticity.
 - [x] Add and run focused validation/status tests; verify a real barcode end to end.
+- [ ] Connect an authoritative NAFDAC or authorized MAS data source for true registration, batch, and expiry verification — blocked until that data access is provided or authorized.
