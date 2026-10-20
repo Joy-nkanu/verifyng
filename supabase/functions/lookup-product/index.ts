@@ -1,7 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { isValidBarcode, normalizeCatalogResponse } from "./lookup.ts";
 
-const fields = "code,product_name,brands,categories,ingredients_text,manufacturing_places,countries";
+const fields = "code,product_name,brands,categories,ingredients_text,manufacturing_places,countries,manufacturing_date,expiration_date";
 
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {

@@ -10,12 +10,12 @@ const steps = [
   {
     icon: Search,
     title: "We Verify",
-    description: "We check the barcode against registered products in our database.",
+    description: "We look up the barcode in a public product catalog.",
   },
   {
     icon: ShieldCheck,
     title: "Get Results",
-    description: "See production date, expiry, manufacturer, and authenticity status instantly.",
+    description: "See listed product details. Official batch and registration checks need an authorized source.",
   },
 ];
 
