@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793970951011,
+      "tag": "0000_nafdac_registration_import",
+      "breakpoints": true
+    }
+  ]
 }

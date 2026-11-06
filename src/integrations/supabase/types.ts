@@ -14,16 +14,374 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      import_batches: {
+        Row: {
+          batch_name: string
+          completed_at: string | null
+          created_at: string
+          duplicate_records: number
+          error_report: Json
+          id: string
+          import_status: string
+          records_flagged: number
+          records_imported: number
+          records_updated: number
+          rejected_records: number
+          source: string
+          started_at: string
+          total_records_received: number
+        }
+        Insert: {
+          batch_name: string
+          completed_at?: string | null
+          created_at?: string
+          duplicate_records?: number
+          error_report?: Json
+          id?: string
+          import_status?: string
+          records_flagged?: number
+          records_imported?: number
+          records_updated?: number
+          rejected_records?: number
+          source: string
+          started_at?: string
+          total_records_received?: number
+        }
+        Update: {
+          batch_name?: string
+          completed_at?: string | null
+          created_at?: string
+          duplicate_records?: number
+          error_report?: Json
+          id?: string
+          import_status?: string
+          records_flagged?: number
+          records_imported?: number
+          records_updated?: number
+          rejected_records?: number
+          source?: string
+          started_at?: string
+          total_records_received?: number
+        }
+        Relationships: []
+      }
+      nafdac_products: {
+        Row: {
+          active_ingredients: Json
+          applicant_name: string | null
+          approval_date: string | null
+          atc_code: string | null
+          composition: Json | null
+          created_at: string
+          derived_verification_status: string
+          dosage_form: string | null
+          first_imported_at: string
+          id: string
+          ingredient_synonyms: Json
+          last_updated_at: string
+          last_verified_at: string
+          manufacturer_name: string | null
+          marketing_category: string | null
+          pack_size: string | null
+          product_category: string | null
+          product_detail_url: string | null
+          product_information_url: string | null
+          product_name: string
+          raw_payload: Json
+          registration_expiry_date: string | null
+          registration_number: string | null
+          review_flags: Json
+          route_of_administration: string | null
+          source_product_id: string
+          source_status: string
+          strength: string | null
+          updated_at: string
+        }
+        Insert: {
+          active_ingredients?: Json
+          applicant_name?: string | null
+          approval_date?: string | null
+          atc_code?: string | null
+          composition?: Json | null
+          created_at?: string
+          derived_verification_status?: string
+          dosage_form?: string | null
+          first_imported_at?: string
+          id?: string
+          ingredient_synonyms?: Json
+          last_updated_at?: string
+          last_verified_at?: string
+          manufacturer_name?: string | null
+          marketing_category?: string | null
+          pack_size?: string | null
+          product_category?: string | null
+          product_detail_url?: string | null
+          product_information_url?: string | null
+          product_name: string
+          raw_payload?: Json
+          registration_expiry_date?: string | null
+          registration_number?: string | null
+          review_flags?: Json
+          route_of_administration?: string | null
+          source_product_id: string
+          source_status?: string
+          strength?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active_ingredients?: Json
+          applicant_name?: string | null
+          approval_date?: string | null
+          atc_code?: string | null
+          composition?: Json | null
+          created_at?: string
+          derived_verification_status?: string
+          dosage_form?: string | null
+          first_imported_at?: string
+          id?: string
+          ingredient_synonyms?: Json
+          last_updated_at?: string
+          last_verified_at?: string
+          manufacturer_name?: string | null
+          marketing_category?: string | null
+          pack_size?: string | null
+          product_category?: string | null
+          product_detail_url?: string | null
+          product_information_url?: string | null
+          product_name?: string
+          raw_payload?: Json
+          registration_expiry_date?: string | null
+          registration_number?: string | null
+          review_flags?: Json
+          route_of_administration?: string | null
+          source_product_id?: string
+          source_status?: string
+          strength?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_ingredients: {
+        Row: {
+          composition_details: Json | null
+          created_at: string
+          id: string
+          ingredient_name: string
+          ingredient_synonyms: Json
+          product_id: string
+          strength: string | null
+        }
+        Insert: {
+          composition_details?: Json | null
+          created_at?: string
+          id?: string
+          ingredient_name: string
+          ingredient_synonyms?: Json
+          product_id: string
+          strength?: string | null
+        }
+        Update: {
+          composition_details?: Json | null
+          created_at?: string
+          id?: string
+          ingredient_name?: string
+          ingredient_synonyms?: Json
+          product_id?: string
+          strength?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_ingredients_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "nafdac_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      registration_status_history: {
+        Row: {
+          created_at: string
+          id: string
+          new_status: string
+          previous_status: string
+          product_id: string
+          source_batch_id: string | null
+          source_observed_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          new_status: string
+          previous_status: string
+          product_id: string
+          source_batch_id?: string | null
+          source_observed_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          new_status?: string
+          previous_status?: string
+          product_id?: string
+          source_batch_id?: string | null
+          source_observed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_status_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "nafdac_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_status_history_source_batch_id_fkey"
+            columns: ["source_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staging_records: {
+        Row: {
+          batch_id: string
+          created_at: string
+          id: string
+          processed_at: string | null
+          raw_payload: Json
+          registration_number: string | null
+          source_product_id: string | null
+          validation_errors: Json
+          validation_status: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          raw_payload: Json
+          registration_number?: string | null
+          source_product_id?: string | null
+          validation_errors?: Json
+          validation_status?: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          raw_payload?: Json
+          registration_number?: string | null
+          source_product_id?: string | null
+          validation_errors?: Json
+          validation_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staging_records_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_nafdac_import: {
+        Args: { _batch_name: string; _source: string; _total?: number }
+        Returns: string
+      }
+      finish_nafdac_import: {
+        Args: { _batch_id: string; _errors?: Json; _status: string }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      nafdac_is_iso_date: { Args: { _value: string }; Returns: boolean }
+      process_nafdac_import_chunk: {
+        Args: { _batch_id: string; _records: Json }
+        Returns: Json
+      }
+      search_nafdac_products: {
+        Args: { _limit?: number; _query: string }
+        Returns: {
+          active_ingredients: Json
+          applicant_name: string
+          approval_date: string
+          composition: Json
+          derived_verification_status: string
+          dosage_form: string
+          last_verified_at: string
+          manufacturer_name: string
+          marketing_category: string
+          pack_size: string
+          product_category: string
+          product_detail_url: string
+          product_name: string
+          registration_expiry_date: string
+          registration_number: string
+          review_flags: Json
+          route_of_administration: string
+          source_status: string
+          strength: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +508,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
